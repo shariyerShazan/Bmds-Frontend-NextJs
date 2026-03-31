@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+import AuthWrapper from "@/components/shared/AuthWrapper";
 
 // Load Inter font for specific use cases
 const poppins = Poppins({
@@ -32,7 +33,7 @@ export default function RootLayout({
           <ThemeClientProvider>
             <ReduxProvider>
               <Toaster />
-              {children}
+              <AuthWrapper>{children}</AuthWrapper>
             </ReduxProvider>
           </ThemeClientProvider>
         </AntdRegistry>
