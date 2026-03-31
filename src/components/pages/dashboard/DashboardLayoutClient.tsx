@@ -1,17 +1,19 @@
-'use client';
+"use client";
 
-import DashboardNavbar from '@/components/pages/dashboard/DashboardNavbar';
-import DashboardSidebar from '@/components/pages/dashboard/DashboardSidebar';
-import { logout } from '@/redux/features/authSlice';
-import { useRouter } from 'next/navigation';
-import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import DashboardNavbar from "@/components/pages/dashboard/DashboardNavbar";
+import DashboardSidebar from "@/components/pages/dashboard/DashboardSidebar";
+import { logout } from "@/redux/features/authSlice";
+import { useRouter } from "next/navigation";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 
 interface DashboardLayoutClientProps {
   children: ReactNode;
 }
 
-export default function DashboardLayoutClient({ children }: DashboardLayoutClientProps) {
+export default function DashboardLayoutClient({
+  children,
+}: DashboardLayoutClientProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -20,28 +22,30 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
 
   // Force logout if email was changed — on mount (handles refresh)
   useEffect(() => {
-    const pendingLogout = localStorage.getItem('email_changed_pending_logout');
+    const pendingLogout = localStorage.getItem("email_changed_pending_logout");
     if (pendingLogout) {
-      localStorage.removeItem('email_changed_pending_logout');
-      document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      localStorage.removeItem("email_changed_pending_logout");
+      document.cookie =
+        "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       dispatch(logout());
-      router.replace('/auth/login');
+      router.replace("/auth/login");
     }
   }, [dispatch, router]);
 
   // Force logout across other open tabs (storage event fires in OTHER tabs)
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'email_changed_pending_logout' && e.newValue === 'true') {
-        localStorage.removeItem('email_changed_pending_logout');
-        document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      if (e.key === "email_changed_pending_logout" && e.newValue === "true") {
+        localStorage.removeItem("email_changed_pending_logout");
+        document.cookie =
+          "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         dispatch(logout());
-        router.replace('/auth/login');
+        router.replace("/auth/login");
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, [dispatch, router]);
 
   // ✅ Handle client-side hydration
@@ -54,7 +58,7 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
     const mobile = window.innerWidth < 768;
     const tablet = window.innerWidth < 1024;
 
-    setIsMobile(prevMobile => {
+    setIsMobile((prevMobile) => {
       const shouldCollapse = mobile || tablet;
 
       if (prevMobile !== mobile) {
@@ -62,7 +66,7 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
         return mobile;
       }
 
-      setCollapsed(prevCollapsed => {
+      setCollapsed((prevCollapsed) => {
         if (shouldCollapse !== prevCollapsed) {
           return shouldCollapse;
         }
@@ -77,17 +81,17 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
     if (!isClient) return;
 
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [handleResize, isClient]);
 
   const handleToggleCollapse = useCallback(() => {
-    setCollapsed(prev => !prev);
+    setCollapsed((prev) => !prev);
   }, []);
 
   const gridClass = useMemo(() => {
-    if (isMobile) return 'grid-cols-1';
-    return collapsed ? 'grid-cols-[80px_1fr]' : 'grid-cols-[240px_1fr]';
+    if (isMobile) return "grid-cols-1";
+    return collapsed ? "grid-cols-[80px_1fr]" : "grid-cols-[240px_1fr]";
   }, [isMobile, collapsed]);
 
   if (!isClient) {
@@ -101,7 +105,9 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
   }
 
   return (
-    <div className={`h-screen grid transition-all duration-300 ${gridClass} overflow-x-hidden`}>
+    <div
+      className={`h-screen grid transition-all duration-300 ${gridClass} overflow-x-hidden`}
+    >
       {/* Sidebar */}
       <DashboardSidebar
         collapsed={collapsed}
@@ -118,19 +124,19 @@ export default function DashboardLayoutClient({ children }: DashboardLayoutClien
       )}
 
       {/* Main Content Area */}
-      <div className={`grid grid-rows-[auto_1fr] ${isMobile ? 'col-start-1' : ''}`}>
+      <div
+        className={`grid grid-rows-[auto_1fr] ${isMobile ? "col-start-1" : ""}`}
+      >
         {/* Navbar */}
         <DashboardNavbar
-        //   collapsed={collapsed}
+          //   collapsed={collapsed}
           isMobile={isMobile}
           onToggle={handleToggleCollapse}
         />
 
         {/* Content Area */}
         <main className="overflow-auto relative custom-scrollbar">
-          <div className="p-4 sm:p-6 md:p-8 xl:p-10 h-full">
-            {children}
-          </div>
+          <div className="p-4 sm:p-6 md:p-8 xl:p-10 h-full">{children}</div>
         </main>
       </div>
     </div>

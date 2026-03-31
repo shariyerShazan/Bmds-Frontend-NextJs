@@ -3,7 +3,7 @@
 @custom-variant dark (&:is(.dark *));
 
 body {
-    @apply text-gray-900 bg-white dark:text-gray-100 dark:bg-[#141414] transition-colors duration-300;
+  @apply text-gray-900 bg-white dark:text-gray-100 dark:bg-[#141414] transition-colors duration-300;
 }
 
 /* Dashboard sidebar related css */
@@ -23,7 +23,9 @@ body {
   border-radius: 8px !important;
   padding: 12px 16px !important;
   height: auto !important;
-  width: calc(100% - 24px) !important; /* Prevents horizontal scroll by accounting for horizontal margins */
+  width: calc(
+    100% - 24px
+  ) !important; /* Prevents horizontal scroll by accounting for horizontal margins */
   transition: all 0.2s ease !important;
 }
 
@@ -149,15 +151,23 @@ html.dark .custom-menu .ant-menu-item-selected .ant-menu-item-icon {
 }
 
 @media (prefers-color-scheme: dark) {
-  .dark .overflow-x-auto::-webkit-scrollbar-track { background: #1f1f1f; }
-  .dark .overflow-x-auto::-webkit-scrollbar-thumb { background: #4b5563; }
-  .dark .overflow-x-auto::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+  .dark .overflow-x-auto::-webkit-scrollbar-track {
+    background: #1f1f1f;
+  }
+  .dark .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+  .dark .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
 
   .dark .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: #334155;
     border: 2px solid #000000;
   }
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #475569; }
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #475569;
+  }
 }
 
 .overflow-x-auto::-webkit-scrollbar-track {

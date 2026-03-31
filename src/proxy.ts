@@ -8,7 +8,11 @@ export default async function proxy(request: NextRequest) {
 
   // If trying to access auth pages while authenticated, redirect to dashboard
   // Exception: verify-email-change must be accessible while authenticated
-  if (pathname.startsWith("/auth") && isAuthenticated && !pathname.startsWith("/auth/verify-email-change")) {
+  if (
+    pathname.startsWith("/auth") &&
+    isAuthenticated &&
+    !pathname.startsWith("/auth/verify-email-change")
+  ) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 

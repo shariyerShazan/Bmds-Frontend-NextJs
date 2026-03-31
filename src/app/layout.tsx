@@ -27,9 +27,7 @@ export default function RootLayout({
   return (
     // suppressHydrationWarning is highly recommended for next-themes to prevent flickering classes
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${poppins.variable} antialiased`}
-      >
+      <body className={`${poppins.variable} antialiased`}>
         <AntdRegistry>
           <ThemeClientProvider>
             <ReduxProvider>

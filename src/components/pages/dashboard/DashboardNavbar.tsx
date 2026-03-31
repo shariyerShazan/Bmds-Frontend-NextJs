@@ -1,5 +1,6 @@
 "use client";
 
+import { useLogoutMutation } from "@/redux/api/authApi";
 import { logout } from "@/redux/features/authSlice";
 import { RootState } from "@/redux/store";
 import { MenuOutlined, MoonOutlined, SunOutlined, UserOutlined } from "@ant-design/icons";
@@ -23,7 +24,7 @@ export default function DashboardNavbar({
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
-
+  const [userLogout, { isLoading }] = useLogoutMutation();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -54,6 +55,7 @@ export default function DashboardNavbar({
       const { key } = menuInfo;
 
       if (key === "logout") {
+        userLogout();
         dispatch(logout());
         document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         toast.success("Logged out successfully!");
