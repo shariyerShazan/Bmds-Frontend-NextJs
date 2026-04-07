@@ -5,6 +5,8 @@ import { Skeleton, Button, Result } from "antd";
 import { LockOutlined, LogoutOutlined } from "@ant-design/icons";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { logout } from "@/redux/features/authSlice";
 // import { useSelector } from "react-redux";
 // import type { RootState } from "@/redux/store";
 
@@ -20,10 +22,10 @@ export default function AuthWrapper({
   } = useGetMeQuery(undefined, {
     skip: false,
   });
-  const [logout] = useLogoutMutation();
+  const [userLogout] = useLogoutMutation();
   const pathname = usePathname();
   const router = useRouter();
-
+  const dispatch  = useDispatch()
   // const auth = useSelector((state: RootState) => state.auth);
   // const isLoggedIn = Boolean(auth.isAuthenticated || auth.accessToken);
 
@@ -46,7 +48,8 @@ export default function AuthWrapper({
 
   const handleLogout = async () => {
     try {
-      await logout(undefined).unwrap();
+      await userLogout(undefined).unwrap();
+      dispatch(logout());
     } catch (error) {
     } finally {
       window.location.href = "/auth/login";
