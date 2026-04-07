@@ -1,34 +1,62 @@
 "use client";
 
-import { useGetMeQuery } from "@/redux/api/authApi";
+import { useGetMeQuery, useLogoutMutation } from "@/redux/api/authApi";
 import { Skeleton, Button, Result } from "antd";
 import { LockOutlined, LogoutOutlined } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
-import { useLogoutMutation } from "@/redux/api/authApi"; // Logout mutation import korun
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+// import { useSelector } from "react-redux";
+// import type { RootState } from "@/redux/store";
 
 export default function AuthWrapper({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { data: user, isLoading } = useGetMeQuery();
-  const [logout] = useLogoutMutation(); // Logout mutation hook
+  const {
+    data: apiUser,
+    isLoading,
+    isFetching,
+  } = useGetMeQuery(undefined, {
+    skip: false,
+  });
+  const [logout] = useLogoutMutation();
+  const pathname = usePathname();
   const router = useRouter();
+
+  // const auth = useSelector((state: RootState) => state.auth);
+  // const isLoggedIn = Boolean(auth.isAuthenticated || auth.accessToken);
+
+  // ✅ Redirect logic: auth state wins, then API status
+  useEffect(() => {
+    if (isLoading || isFetching) return;
+
+    const isAuthPage = pathname.startsWith("/auth");
+    const haveUser = Boolean(apiUser?.data?.id);
+
+    if (haveUser && isAuthPage) {
+      router.replace("/dashboard");
+      return;
+    }
+
+    if (!haveUser && !isAuthPage) {
+      router.replace("/auth/login");
+    }
+  }, [isLoading, isFetching, apiUser, pathname, router]);
 
   const handleLogout = async () => {
     try {
-      // 1. Backend theke cookie clear kora (logout endpoint call)
       await logout(undefined).unwrap();
-      window.location.href = "/auth/login";
     } catch (error) {
-      // Error holeo login page e pathiye deya safe
+    } finally {
       window.location.href = "/auth/login";
     }
   };
 
-  if (isLoading) {
+  // 🔄 Loading UI
+  if (isLoading || isFetching) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-10 bg-white dark:bg-[#001529]">
+      <div className="flex items-center justify-center min-h-screen p-10">
         <div className="w-full max-w-2xl">
           <Skeleton active avatar paragraph={{ rows: 4 }} />
         </div>
@@ -36,32 +64,25 @@ export default function AuthWrapper({
     );
   }
 
-  if (user?.data?.status === "BLOCKED") {
+  // 🚫 Blocked user
+  if (apiUser?.data?.status === "BLOCKED") {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-slate-950 px-4">
-        <div className="max-w-md w-full bg-white dark:bg-slate-900 shadow-2xl rounded-2xl p-8 border border-gray-100 dark:border-slate-800">
+      <div className="flex items-center justify-center min-h-screen px-4">
+        <div className="max-w-md w-full shadow-2xl rounded-2xl p-8">
           <Result
             status="error"
-            icon={<LockOutlined className="text-red-500 text-6xl" />}
-            title={
-              <span className="text-2xl font-bold text-gray-800 dark:text-gray-100">
-                Account Blocked
-              </span>
-            }
-            subTitle={
-              <div className="text-gray-600 dark:text-gray-400">
-                Your account has been restricted by the administrator.
-              </div>
-            }
+            icon={<LockOutlined />}
+            title="Account Blocked"
+            subTitle="Your account has been restricted by the administrator."
             extra={[
               <Button
-                key="login"
+                key="logout"
                 type="primary"
                 danger
                 size="large"
                 icon={<LogoutOutlined />}
-                onClick={handleLogout} // Updated click handler
-                className="w-full rounded-lg h-12 font-semibold"
+                onClick={handleLogout}
+                className="w-full"
               >
                 Logout and Return to Login
               </Button>,

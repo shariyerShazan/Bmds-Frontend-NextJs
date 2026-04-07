@@ -1,17 +1,15 @@
-import { getBaseUrl } from "@/lib/base_url";
+// import { getBaseUrl } from "@/lib/base_url";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { RootState } from "../store";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: getBaseUrl(),
+  baseUrl: "https://bmds-server-nestjs-postgesql.onrender.com/api/v1",
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
-    // Set access token from Redux state as Authorization header
     const token = (getState() as RootState).auth.accessToken;
     if (token) {
-      headers.set("Authorization", `${token}`);
+      headers.set("Authorization", `Bearer ${token}`);
     }
-
     return headers;
   },
 });

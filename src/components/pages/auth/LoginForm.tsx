@@ -30,19 +30,14 @@ export default function LoginForm() {
 
   const onFinish = async (values: LoginFormData) => {
     try {
+      // Login API call
       const result = await login({
         email: values.email,
         password: values.password,
       }).unwrap();
 
       if (result.success) {
-        // Store access token in Redux
         dispatch(setAccessToken(result.data.access_token));
-
-        // Set access token cookie for middleware auth checks
-        document.cookie = `accessToken=${result.data.access_token}; path=/;`;
-
-        // Fetch user profile after successful login
         const meResult = await getMe().unwrap();
         if (meResult.success) {
           dispatch(setUser(meResult.data));
@@ -58,7 +53,6 @@ export default function LoginForm() {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      {/* Header Outside of Card */}
       <div className="text-center mb-8 flex flex-col items-center">
         <Logo className="mb-10 scale-120" />
         <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight mb-2 transition-colors">
@@ -69,9 +63,7 @@ export default function LoginForm() {
         </p>
       </div>
 
-      {/* Card Container */}
       <div className="bg-white/95 dark:bg-[#141414]/95 backdrop-blur-sm rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.3)] border border-gray-100 dark:border-white/10 p-8 sm:p-10 mb-8 mt-2 transition-colors">
-        {/* Form */}
         <Form
           form={form}
           name="loginForm"
@@ -137,9 +129,7 @@ export default function LoginForm() {
             />
           </Form.Item>
 
-          {/* Forgot Password Link & Remember Me container */}
           <div className="flex items-center justify-between mb-8">
-            {/* Remember Me */}
             <Form.Item
               name="remember"
               valuePropName="checked"
@@ -158,7 +148,6 @@ export default function LoginForm() {
             </Link>
           </div>
 
-          {/* Login Button */}
           <Form.Item className="!mb-0">
             <Button
               type="primary"

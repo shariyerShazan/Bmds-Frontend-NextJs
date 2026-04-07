@@ -57,7 +57,8 @@ export default function DashboardNavbar({
       if (key === "logout") {
         userLogout();
         dispatch(logout());
-        document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie =
+          "accessToken=; Max-Age=0; path=/; SameSite=Lax";
         toast.success("Logged out successfully!");
         router.push("/auth/login");
       } else if (key === "settings") {
@@ -111,20 +112,20 @@ export default function DashboardNavbar({
           />
         )}
 
-      {/* User Profile */}
-      <Dropdown menu={dropdownMenu} trigger={["click"]} placement="bottomRight">
-        <div className="flex items-center !space-x-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-[#1f1f1f] p-2 rounded-xl transition-all duration-200 border border-transparent hover:border-slate-200 dark:hover:border-white/10">
-          <Avatar
-            size={42}
-            className="shadow-sm !bg-gradient-to-tr !from-[#272877] !to-[#4143a3] font-semibold"
-            icon={<UserOutlined />}
-          />
-          <div className="hidden sm:block pr-1">
-            <div className="text-gray-800 dark:text-gray-100 font-semibold text-sm transition-colors">{displayName}</div>
-            <div className="text-xs text-gray-400 dark:text-gray-500 font-medium -mt-0.5 transition-colors">{roleLabel}</div>
+        {/* User Profile */}
+        <Dropdown menu={dropdownMenu} trigger={["click"]} placement="bottomRight">
+          <div className="flex items-center !space-x-3 cursor-pointer hover:bg-slate-100 dark:hover:bg-[#1f1f1f] p-2 rounded-xl transition-all duration-200 border border-transparent hover:border-slate-200 dark:hover:border-white/10">
+            <Avatar
+              size={42}
+              className="shadow-sm !bg-gradient-to-tr !from-[#272877] !to-[#4143a3] font-semibold"
+              icon={<UserOutlined />}
+            />
+            <div className="hidden sm:block pr-1">
+              <div className="text-gray-800 dark:text-gray-100 font-semibold text-sm transition-colors">{displayName}</div>
+              <div className="text-xs text-gray-400 dark:text-gray-500 font-medium -mt-0.5 transition-colors">{roleLabel}</div>
+            </div>
           </div>
-        </div>
-      </Dropdown>
+        </Dropdown>
       </div>
     </div>
   );

@@ -26,6 +26,7 @@ export const authApi = baseApi.injectEndpoints({
         method: "POST",
         body: credentials,
       }),
+      invalidatesTags: ["Auth"],
     }),
     getMe: builder.query<GetMeResponse, void>({
       query: () => "/auth/get-me",
