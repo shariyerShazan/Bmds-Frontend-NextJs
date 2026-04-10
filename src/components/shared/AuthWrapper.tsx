@@ -7,57 +7,62 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { logout } from "@/redux/features/authSlice";
-// import { useSelector } from "react-redux";
-// import type { RootState } from "@/redux/store";
 
 export default function AuthWrapper({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  // 1. Logic: Auth page e thakle query skip korbo
+  const isAuthPage = pathname.startsWith("/auth");
+
   const {
     data: apiUser,
     isLoading,
     isFetching,
+    isError,
   } = useGetMeQuery(undefined, {
-    skip: false,
+    // Auth page e thakle query pathabo na
+    skip: isAuthPage,
   });
-  const [userLogout] = useLogoutMutation();
-  const pathname = usePathname();
-  const router = useRouter();
-  const dispatch  = useDispatch()
-  // const auth = useSelector((state: RootState) => state.auth);
-  // const isLoggedIn = Boolean(auth.isAuthenticated || auth.accessToken);
 
-  // ✅ Redirect logic: auth state wins, then API status
+  const [userLogout] = useLogoutMutation();
+
   useEffect(() => {
+    // Loading thakle kichu korbo na
     if (isLoading || isFetching) return;
 
-    const isAuthPage = pathname.startsWith("/auth");
     const haveUser = Boolean(apiUser?.data?.id);
 
+    // 2. Jodi user login kora thake kintu login page e thake -> dashboard e pathao
     if (haveUser && isAuthPage) {
       router.replace("/dashboard");
-      return;
     }
 
-    if (!haveUser && !isAuthPage) {
+    // 3. Jodi user na thake (error hoy ba data nai) ebong auth page e na thake -> login e pathao
+    if (!haveUser && !isAuthPage && !isLoading) {
       router.replace("/auth/login");
     }
-  }, [isLoading, isFetching, apiUser, pathname, router]);
+  }, [isLoading, isFetching, apiUser, pathname, router, isAuthPage]);
 
   const handleLogout = async () => {
     try {
       await userLogout(undefined).unwrap();
       dispatch(logout());
     } catch (error) {
+      console.error("Logout failed", error);
     } finally {
+      // Force reload to clear all states
       window.location.href = "/auth/login";
     }
   };
 
-  // 🔄 Loading UI
-  if (isLoading || isFetching) {
+  // 4. Loading State handling (Sudhu private route er jonno loading dekhabo)
+  if (!isAuthPage && (isLoading || isFetching)) {
     return (
       <div className="flex items-center justify-center min-h-screen p-10">
         <div className="w-full max-w-2xl">
@@ -67,8 +72,8 @@ export default function AuthWrapper({
     );
   }
 
-  // 🚫 Blocked user
-  if (apiUser?.data?.status === "BLOCKED") {
+  // 5. Blocked User Logic
+  if (apiUser?.data?.status === "BLOCKED" && !isAuthPage) {
     return (
       <div className="flex items-center justify-center min-h-screen px-4">
         <div className="max-w-md w-full shadow-2xl rounded-2xl p-8">
