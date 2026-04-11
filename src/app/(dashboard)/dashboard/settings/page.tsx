@@ -1,6 +1,7 @@
 "use client";
 
 import EmployeeManagementTab from "@/components/pages/dashboard/EmployeeManagementTab";
+import {useEffect} from "react"
 import {
   useChangeEmailMutation,
   useChangePasswordMutation,
@@ -25,6 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
+  const [activeTab, setActiveTab] = useState("profile");
   const [passwordForm] = Form.useForm();
   const [nameForm] = Form.useForm();
   const [emailForm] = Form.useForm();
@@ -49,6 +51,22 @@ export default function SettingsPage() {
     confirmPassword: string;
   }
 
+useEffect(() => {
+  const savedTab = localStorage.getItem("settings_active_tab");
+
+  if (savedTab === "employees" && user?.role !== "ADMIN") {
+    setActiveTab("profile");
+    localStorage.setItem("settings_active_tab", "profile");
+  } else if (savedTab) {
+    setActiveTab(savedTab);
+  }
+}, [user]);
+
+  const handleTabChange = (key: string) => {
+  setActiveTab(key);
+  localStorage.setItem("settings_active_tab", key);
+};
+  
   const handlePasswordFormSubmit = async (values: PasswordFormValues) => {
     try {
       const result = await changePassword({
@@ -576,11 +594,12 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <Tabs
-        defaultActiveKey="profile"
-        items={items}
-        className="settings-tabs"
-      />
+<Tabs
+  activeKey={activeTab}
+  onChange={handleTabChange}
+  items={items}
+  className="settings-tabs"
+/>
 
       {/* Email Change Caution Modal */}
       <Modal
